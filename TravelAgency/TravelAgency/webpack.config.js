@@ -1,22 +1,34 @@
-"use strict"
-{
-    // Требуется для формирования полного output пути
-    let path = require('path');
+const path = require('path')
+const webpack = require('webpack')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const OptimizeCSSPlugin = require('optimise-css-assets-webpack-plugin')
+const bundleOutputDir = './wwwroot/dist'
 
-    // Плагин для очистки выходной папки (bundle) перед созданием новой
-    const CleanWebpackPlugin = require('clean-webpack-plugin');
+module.exports = () => {
+    console.log('building', process.env.NODE_ENV)
 
-    // Путь к выходной папке
-    const bundleFolder = "wwwroot/bundle/";
+    const isDevBuild = !(process.env.NODE_ENV && process.env.NODE_ENV === 'production')
 
-    module.exports = {
-        // Точка входа в приложение
-        entry: "./Scripts/main.ts",
+    const extractCSS = new MiniCssExtractPlugin({
+        filename: 'style.css'
+    })
 
-        // Выходной файл
+    return [{
+        mode: (isDevBuild ? 'development' : 'production'),
+        stats: { modules: false },
+        entry: { 'main': './Scripts/main.ts' },
+
         output: {
             filename: 'script.js',
             path: path.resolve(__dirname, bundleFolder)
+        },
+        resolve: {
+            extensions: [".tsx", ".ts", ".js"]
+        },
+        output: {
+            path: path.join(__dirname, bundleOutputDir),
+            filename: '[name].js',
+            publicPath: '/dist/'
         },
         module: {
             rules: [
@@ -25,16 +37,35 @@
                     loader: "ts-loader",
                     exclude: /node_modules/,
                 },
+                { test: /\.css$/, use: isDevBuild ? ['style-loader', 'css-loader'] : [MiniCssExtractPlugin.loader, 'css-loader'] },
+                { test: /\.scss$/, use: isDevBuild ? ['style-loader', 'css-loader', 'sass-loader'] : [MiniCssExtractPlugin.loader, 'sass-loader'] },
+                { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
             ]
         },
-        resolve: {
-            extensions: [".tsx", ".ts", ".js"]
-        },
         plugins: [
-            new CleanWebpackPlugin([bundleFolder])
-        ],
-        // Включаем генерацию отладочной информации внутри выходного файла
-        // (Нужно для работы отладки клиентских скриптов)
-        devtool: "inline-source-map"
-    };
+            new webpack.DllReferencePlugin({
+                context: __dirname,
+                manifest: require('./wwwroot/dist/vendor-manifest.json')
+            })
+        ].concat(isDevBuild ? [
+            // Plugins that apply in development builds only
+            new webpack.SourceMapDevToolPlugin({
+                filename: '[file].map', // Remove this line if you prefer inline source maps
+                moduleFilenameTemplate: path.relative(bundleOutputDir, '[resourcePath]') // Point sourcemap entries to the original file locations on disk
+            })
+        ] : [
+        extractCSS,
+        // Compress extracted CSS.
+        new OptimizeCSSPlugin({
+            cssProcessorOptions: {
+                safe: true
+            }
+        })
+    }]
 }
+
+
+
+
+
+
