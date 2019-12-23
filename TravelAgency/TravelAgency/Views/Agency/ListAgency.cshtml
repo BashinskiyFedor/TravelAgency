@@ -1,0 +1,10 @@
+﻿@model AgencyListViewModel
+<h2>Список турагенств</h2>
+<div class="row mt-5 mb-2">
+    @{
+        foreach (Agency agency in Model.AllAgency)
+        {
+            @Html.Partial("_AllAgency", agency)
+        }
+    }
+</div>

@@ -1,0 +1,10 @@
+﻿@model TourListViewModel
+<h2>Список доступных туров на сегодня</h2>
+<div class="row mt-5 mb-2">
+    @{ 
+        foreach(Tour tour in Model.AllTour)
+        {
+            @Html.Partial("_AllTour", tour)
+        }
+    }
+</div>

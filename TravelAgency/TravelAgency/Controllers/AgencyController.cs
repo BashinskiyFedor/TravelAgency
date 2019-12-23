@@ -9,26 +9,25 @@ using TravelAgency.ViewModel;
 
 namespace TravelAgency.Controllers
 {
-
     [Authorize]
-    public class HomeController : Controller
+    public class AgencyController : Controller
     {
-        private readonly IAgencyTour _tourRep;
+        private readonly IAllAgency _agencyRep;
 
-        
-        public HomeController(IAgencyTour tourRepository)
+        public AgencyController(IAllAgency agency)
         {
-            _tourRep = tourRepository;
+            _agencyRep = agency;
         }
 
         [Authorize]
-        public ViewResult Index()
+        [Route("Agency/ListAgency")]
+        public ViewResult ListAgency()
         {
-            var homeTours = new HomeViewModel
+            var agency = new AgencyListViewModel
             {
-                favTours = _tourRep.GetFavTours
+                AllAgency = _agencyRep.AllAgencies
             };
-            return View(homeTours);
+            return View(agency);
         }
     }
 }
