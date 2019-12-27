@@ -1,71 +1,50 @@
-const path = require('path')
-const webpack = require('webpack')
+﻿"use strict";
+const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const OptimizeCSSPlugin = require('optimise-css-assets-webpack-plugin')
-const bundleOutputDir = './wwwroot/dist'
 
-module.exports = () => {
-    console.log('building', process.env.NODE_ENV)
-
-    const isDevBuild = !(process.env.NODE_ENV && process.env.NODE_ENV === 'production')
-
-    const extractCSS = new MiniCssExtractPlugin({
-        filename: 'style.css'
-    })
-
-    return [{
-        mode: (isDevBuild ? 'development' : 'production'),
-        stats: { modules: false },
-        entry: { 'main': './Scripts/main.ts' },
-
-        output: {
-            filename: 'script.js',
-            path: path.resolve(__dirname, bundleFolder)
-        },
-        resolve: {
-            extensions: [".tsx", ".ts", ".js"]
-        },
-        output: {
-            path: path.join(__dirname, bundleOutputDir),
-            filename: '[name].js',
-            publicPath: '/dist/'
-        },
-        module: {
-            rules: [
-                {
-                    test: /\.tsx?$/,
-                    loader: "ts-loader",
-                    exclude: /node_modules/,
-                },
-                { test: /\.css$/, use: isDevBuild ? ['style-loader', 'css-loader'] : [MiniCssExtractPlugin.loader, 'css-loader'] },
-                { test: /\.scss$/, use: isDevBuild ? ['style-loader', 'css-loader', 'sass-loader'] : [MiniCssExtractPlugin.loader, 'sass-loader'] },
-                { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
-            ]
-        },
-        plugins: [
-            new webpack.DllReferencePlugin({
-                context: __dirname,
-                manifest: require('./wwwroot/dist/vendor-manifest.json')
-            })
-        ].concat(isDevBuild ? [
-            // Plugins that apply in development builds only
-            new webpack.SourceMapDevToolPlugin({
-                filename: '[file].map', // Remove this line if you prefer inline source maps
-                moduleFilenameTemplate: path.relative(bundleOutputDir, '[resourcePath]') // Point sourcemap entries to the original file locations on disk
-            })
-        ] : [
-        extractCSS,
-        // Compress extracted CSS.
-        new OptimizeCSSPlugin({
-            cssProcessorOptions: {
-                safe: true
-            }
+module.exports = {
+    entry: { main: "./Client/index.ts" },
+    output: {
+        path: path.resolve(__dirname, './wwwroot/dist/'),
+        filename: "bundle.js"
+    },
+    resolve: {
+        extensions: [".tsx", ".ts", ".js", '.scss']
+    },
+    devServer: {
+        contentBase: ".",
+        host: "localhost",
+        port: 9000
+    },
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                loader: "ts-loader",
+                exclude: /node_modules/,
+            },
+            { test: /\.css$/, use: "development" ? ['style-loader', 'css-loader'] : [MiniCssExtractPlugin.loader, 'css-loader'] },
+            {
+                test: /\.scss$/,
+                use: [
+                    'style-loader',
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: { sourceMap: true }
+                    }, {
+                        loader: 'sass-loader',
+                        options: { sourceMap: true }
+                    }
+                ]
+            },
+            { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
+        ]
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: "style/name.css"
         })
-    }]
-}
 
-
-
-
-
-
+    ]
+};

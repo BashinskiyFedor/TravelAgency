@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <NpmCommand>run webpack</NpmCommand>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\img\" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties package_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>
