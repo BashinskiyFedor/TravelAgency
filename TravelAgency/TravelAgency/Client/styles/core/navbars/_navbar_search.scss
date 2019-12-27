@@ -1,0 +1,37 @@
+﻿.navbar-search {
+    .input-group {
+        border-radius: $navba-search-border-radius;
+        border: $navbar-search-border-width solid;
+        background-color: transparent;
+    }
+
+    .form-control {
+        width: $navbar-search-width;
+        background-color: transparent;
+    }
+}
+
+.navbar-search-dark {
+    .input-group {
+        border-color: $navbar-search-dark-border-color;
+    }
+
+    .input-group-text {
+        color: $navbar-search-dark-color;
+    }
+
+    .form-control {
+        color: $navbar-search-dark-focus-color;
+
+        &::placeholder {
+            color: $navbar-search-dark-color;
+        }
+    }
+
+    .focused {
+        &.input-group {
+            transition: 0.8s;
+            border-color: $navbar-search-dark-focus-border-color;
+        }
+    }
+}
